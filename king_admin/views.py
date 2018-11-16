@@ -49,7 +49,7 @@ def display_table_objs(request,app_name,table_name):
     #print(list(query_sets)[0])
     # prn_obj(list(query_sets)[0])
     # print(query_sets.has_previous)
-    print("333333333333333333333",query_sets.paginator.page_range,"333333333333333333333333333")
+    print("222222222222222222222222222222",query_sets.paginator.page_range,"333333333333333333333333333")
     return render(request,"king_admin/table_objs.html",{"admin_class":admin_class,
                                                         "query_sets":query_sets,
                                                         "filter_condtions":filter_condtions,
