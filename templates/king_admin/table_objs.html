@@ -10,18 +10,28 @@
           <div class="panel-heading">
             <h3 class="panel-title">Panel title</h3>
           </div>
+
           <div class="panel-body">
                <div class="row">
                 <form class="" method="get">
                   {% for condtion in admin_class.list_filters %}
-                    <div class="col-lg-2">
+                    <div class="col-lg-2" >
                     <span>{{ condtion }}</span>
                     {% render_filter_ele condtion admin_class filter_condtions %}
                     </div>
 
-                  {% endfor %}
 
+                    {% endfor %}
                     <button type="SUBMIT" class="btn btn-success">检索</button>
+                    <hr>
+                    <div class="row">
+                            <div class="col-lg-2" ><input type="search" class="form-control" name="_q" value="{{ search_q }}"  placeholder="search by {% for search in admin_class.search_fields %}{{ search }},{% endfor %}" style="margin-left:15px"></div>
+
+                            <div class="col-lg-2" ><button type="SUBMIT" class="btn btn-success">serch</button></div>
+
+                    </div>
+
+
                 </form>
 
                </div>
@@ -43,7 +53,7 @@
                     {% endfor %}
                   </tbody>
                   <tfoot>
-                  <tr><td><p> total : {{ query_sets.paginator.count }} 条记录</p></td>/tr>
+                  <tr><td><p> total : {{ query_sets.paginator.count }} 条记录</p></td></tr>
                   </tfoot>
               </table>
 
@@ -52,7 +62,7 @@
           <nav>
               <ul class="pagination">
                   {% if query_sets.has_previous %}
-                        <li class=""><a href="?page={{ query_sets.previous_page_number }}">上页</a></li>
+                        <li class=""><a href="?page={{ query_sets.previous_page_number }}&_q={{ search_q }}">上页</a></li>
                   {% endif %}
 {#                   <li class="active"><a>{{ query_sets.number }}</a></li>#}
 
@@ -61,10 +71,10 @@
 {#                  {% endfor %}#}
 
 {#                  {% render_page_ele  loop_counter query_sets filter_condtions %}#}
-                   {% build_paginations   query_sets filter_condtions previous_orderby %}
+                   {% build_paginations   query_sets filter_condtions previous_orderby search_q %}
 
                   {% if query_sets.has_next %}
-                        <li class=""><a href="?page={{ query_sets.next_page_number }}">下页</a></li>
+                        <li class=""><a href="?page={{ query_sets.next_page_number }}&_q={{ search_q }}">下页</a></li>
                   {% endif %}
 
 

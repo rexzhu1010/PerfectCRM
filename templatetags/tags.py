@@ -39,12 +39,12 @@ def build_table_row(obj,admin_class):
             # print("%s 33333333333"%column)
         else:
             column_data = getattr(obj,column)
-        print(type(column_data))
+        # print(type(column_data))
         if type(column_data).__name__ == 'datetime':
-            print(1111111)
-            print(type(column_data))
-            # prn_obj(column_data)
-            print(1111111111)
+            # print(1111111)
+            # print(type(column_data))
+            # # prn_obj(column_data)
+            # print(1111111111)
             column_data = column_data.strftime("%Y-%m-%d %H:%M:%S")
 
         row_ele += "<td>%s</td>" % column_data
@@ -52,12 +52,16 @@ def build_table_row(obj,admin_class):
     return mark_safe(row_ele)
 
 @register.simple_tag
-def build_paginations(query_sets,filter_condtions,previous_orderby):
-    print("build_paginations1111111111111111111111111111111111111111111")
+def build_paginations(query_sets,filter_condtions,previous_orderby,search_q):
+    # print("build_paginations1111111111111111111111111111111111111111111")
     set_previous_orderby=""
     if previous_orderby != "":
         set_previous_orderby="&o=%s"%(previous_orderby)
     page_btn=""
+
+    s_q=""
+    if search_q !="":
+        s_q="&_q=%s"%(search_q)
     for page_num in query_sets.paginator.page_range:
         filters=""
         for k,v in filter_condtions.items():
@@ -71,10 +75,10 @@ def build_paginations(query_sets,filter_condtions,previous_orderby):
             ele_class = ""
             if query_sets.number == page_num:
                 ele_class = "active"
-            page_btn += '''<li class=%s><a href="?page=%s%s%s">%s</a></li>'''%(ele_class,page_num,filters,set_previous_orderby,page_num)
+            page_btn += '''<li class=%s><a href="?page=%s%s%s%s">%s</a></li>'''%(ele_class,page_num,filters,set_previous_orderby,s_q,page_num)
 
         else :
-              print("page_ref:%s,page_num:%s" % (page_ref, page_num))
+              # print("page_ref:%s,page_num:%s" % (page_ref, page_num))
               if page_ref + 1 == page_num:
                   # print("page_ref:%s,page_num:%s"%(page_ref,page_num))
                   page_ref = page_num
@@ -93,8 +97,8 @@ def render_page_ele(loop_counter,query_sets,filter_condtions):
 
     filter_condtions_ele=""
     for k,v in filter_condtions.items():
-        print(filter_condtions)
-        print(k,v,"condtionsssssssssss")
+        # print(filter_condtions)
+        # print(k,v,"condtionsssssssssss")
         filter_condtions_ele+="&%s=%s"%(k,v)
 
     if loop_counter <  3  or loop_counter > query_sets.paginator.num_pages -2:   #代表这是前两页 或 最后两页，要显示
@@ -103,7 +107,7 @@ def render_page_ele(loop_counter,query_sets,filter_condtions):
             ele_class = "active"
         ele = '''<li class="%s"><a href="?page=%s%s">%s</a></li>''' %(ele_class,loop_counter,filter_condtions_ele,loop_counter)
 
-        print("我是%s"%loop_counter,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
+        # print("我是%s"%loop_counter,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
 
         return mark_safe(ele)
 
@@ -154,7 +158,7 @@ def build_table_header_column(column, orderby_key,filter_condtions):
 
 @register.simple_tag
 def set_orderbykey(column,orderby_key):
-    print("我是orderby_key:",orderby_key)
+    # print("我是orderby_key:",orderby_key)
     if orderby_key.strip("-") == column:
         if orderby_key.startswith("-"):
             print("我是排序----------------------------------")
@@ -181,15 +185,15 @@ def render_filter_ele(condtion,admin_class,filter_condtions):
     if field_obj.choices:
         selected = ''
         for choice_item in field_obj.choices:
-            print("choice",choice_item,filter_condtions.get(condtion),type(filter_condtions.get(condtion)))
-            print("filter_condtions:",filter_condtions)
+            # print("choice",choice_item,filter_condtions.get(condtion),type(filter_condtions.get(condtion)))
+            # print("filter_condtions:",filter_condtions)
             if filter_condtions.get(condtion) == str(choice_item[0]):
                 #filter_condtions 为当前GET 请求处理过的 过滤参数，类型为字典
                 selected ="selected"
 
             select_ele += '''<option value='%s' %s>%s</option>''' %(choice_item[0],selected,choice_item[1])
             selected =''
-    print("type(field_obj)",type(field_obj))
+    # print("type(field_obj)",type(field_obj))
     if type(field_obj).__name__ == "ForeignKey":
         selected = ''
         for choice_item in field_obj.get_choices()[1:]:
