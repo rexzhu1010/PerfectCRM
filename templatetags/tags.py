@@ -4,6 +4,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 from king_admin.utils import prn_obj
+from django.utils.timezone import datetime,timedelta
 register = template.Library()
 
 @register.simple_tag
@@ -89,9 +90,6 @@ def build_paginations(query_sets,filter_condtions,previous_orderby,search_q):
     return mark_safe(page_btn)
 
 
-
-
-
 @register.simple_tag
 def render_page_ele(loop_counter,query_sets,filter_condtions):
 
@@ -123,8 +121,6 @@ def render_page_ele(loop_counter,query_sets,filter_condtions):
         return mark_safe(ele)
 
     return '...'
-
-
 
 
 
@@ -170,8 +166,8 @@ def set_orderbykey(column,orderby_key):
 
 
 @register.simple_tag
-def render_filter_ele(condtion,admin_class,filter_condtions):
-    select_ele = '''<select class="form-control" name='%s' ><option value=''>----</option>''' %condtion
+def render_filter_ele(condtion,admin_class,filter_condtions,selectdate):
+    select_ele = '''<select class="form-control" name='{filter_name}' ><option value=''>----</option>'''
 
     #field_obj为字段属性类，condtion 为需要过滤的 表字段，下面通过_meta方法 获得该字段的属性
     field_obj = admin_class.model._meta.get_field(condtion)
@@ -201,5 +197,33 @@ def render_filter_ele(condtion,admin_class,filter_condtions):
                 selected = "selected"
             select_ele += '''<option value='%s' %s>%s</option>''' %(choice_item[0],selected,choice_item[1])
             selected = ''
+
+    if type(field_obj).__name__ in ['DateTimeField','DateField']:
+        date_els = []
+        today_ele =  datetime.now().date()
+        date_els.append(["今天",today_ele ])
+        date_els.append(["昨天", today_ele - timedelta( days=1) ])
+        date_els.append(["近7天", today_ele - timedelta( days=7)])
+        date_els.append(["本月", today_ele.replace(day=1)])
+        date_els.append(["近30天", today_ele - timedelta(days=30)])
+        date_els.append(["近90天", today_ele- timedelta(days=90)])
+        date_els.append(["本年", today_ele .replace(month=1,day=1)])
+        date_els.append(["365天", today_ele- timedelta(days=365)])
+
+        for d in date_els:
+            print(type(str(selectdate)),type(str(d[1])))
+            selected = ""
+            if selectdate :
+                print("111111111111111111111111111111111111")
+                if selectdate == str(d[1]):
+                   print(d[1],222222222222222222222222)
+                   selected = "selected"
+            select_ele += '''<option value='%s' %s>%s</option>'''%(d[1],selected,d[0])
+
+        filter_field_name = "%s__gte"%condtion
+    else:
+        filter_field_name = condtion
+    select_ele = select_ele.format(filter_name=filter_field_name)
+
     select_ele += "</select>"
     return mark_safe(select_ele)

@@ -14,7 +14,7 @@ class BaseAdmin(object):
 
 class CustomerAdmin(BaseAdmin):
     list_display = ['id','qq','name','source','consultant','consult_course','date','status']
-    list_filters = ['source','consultant','consult_course','status',"qq"]
+    list_filters = ['source','consultant','consult_course','status',"qq","date"]
     search_fields = ['qq',"name","consultant__name"]    # consultant 是外键 要按名字搜索 要 __name
     #model = models.Customer
 

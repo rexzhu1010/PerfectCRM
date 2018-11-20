@@ -63,5 +63,6 @@ def display_table_objs(request,app_name,table_name):
                                                         "filter_condtions":filter_condtions,
                                                         "orderby_key":orderby_key,
                                                         "previous_orderby":request.GET.get("o") or "",
-                                                         "search_q":request.GET.get("_q") or ""},
+                                                         "search_q":request.GET.get("_q") or "",
+                                                         "selectdate":request.GET.get("date") or ""},
                                                         )
