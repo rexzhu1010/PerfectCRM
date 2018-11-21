@@ -16,17 +16,19 @@ def get_query_sets(admin_class):
     return admin_class.model.objects.all()
 
 @register.simple_tag
-def build_table_row(obj,admin_class):
+def build_table_row(request,obj,admin_class):
     # print("11111111111")
     # prn_obj(obj)
     # print("11111111111")
     row_ele = ""
-    for column in admin_class.list_display:
+    for index,column in enumerate(admin_class.list_display):
         #obj为全部字段结果，column为需要显示的字段
         field_obj = obj._meta.get_field(column)
         # print("222222")
         # prn_obj(field_obj)
         # print("222222")
+
+
         if field_obj.choices:#choices type
             column_data = getattr(obj,"get_%s_display" % column)()
             # print("55555555555555")
@@ -47,6 +49,10 @@ def build_table_row(obj,admin_class):
             # # prn_obj(column_data)
             # print(1111111111)
             column_data = column_data.strftime("%Y-%m-%d %H:%M:%S")
+
+        if index == 0:  # 在第一列增加 a 标签，跳到change
+
+           column_data = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,obj_id=obj.id,data=column_data)
 
         row_ele += "<td>%s</td>" % column_data
 

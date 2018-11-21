@@ -1,0 +1,35 @@
+{%  extends 'king_admin/table_index.html' %}
+{% load tags %}
+
+
+
+
+{% block container %}
+            change
+
+
+
+        <form class="form-horizontal" method="post">
+        {% for field in form_class %}
+                <div class="form-group">
+                <label for="inputEmail3" class="col-sm-2 control-label">
+                    {% if field.field.required %}
+                        {{ field.label }}
+                    {% else %}
+                        {{ field.label }}
+                    {% endif %}
+                </label>
+                <div class="col-sm-10">
+{#                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
+                   {{field}}
+                </div>
+                </div>
+        {% endfor %}
+            <div class="form-group col-sm-2 pull-right" >
+
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </form>
+{% endblock %}
+
+

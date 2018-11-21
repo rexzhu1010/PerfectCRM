@@ -40,7 +40,7 @@
                   <thead>
                     <tr>
                         {% for column in admin_class.list_display %}
-                            {% build_table_header_column column orderby_key filter_condtions %}
+                            {% build_table_header_column   column orderby_key filter_condtions %}
                         {% endfor %}
                     </tr>
                   </thead>
@@ -48,7 +48,7 @@
                     {#  {% get_query_sets  admin_class as query_sets %}#}
                     {% for obj in query_sets %}
                     <tr>
-                        {% build_table_row obj admin_class %}
+                        {% build_table_row  request obj admin_class %}
                     </tr>
                     {% endfor %}
                   </tbody>

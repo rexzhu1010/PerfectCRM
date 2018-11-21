@@ -3,8 +3,9 @@ import importlib
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from king_admin.utils import  table_filter,prn_obj,table_sort,table_search
 # Create your views here.
-from king_admin import king_admin
+from king_admin import king_admin,forms
 from crm import models
+
 
 def index(request):
     #print(king_admin.enabled_admins['crm']['customerfollowup'].model )
@@ -17,8 +18,6 @@ def index(request):
 
 
 def display_table_objs(request,app_name,table_name):
-
-    request.GET
 
     print("-->",app_name,table_name)
     #models_module = importlib.import_module('%s.models'%(app_name))
@@ -66,3 +65,16 @@ def display_table_objs(request,app_name,table_name):
                                                          "search_q":request.GET.get("_q") or "",
                                                          "selectdate":request.GET.get("date") or ""},
                                                         )
+
+
+
+def table_objs_change(request,app_name,table_name,obj_id):
+    admin_class = king_admin.enable_admins[app_name][table_name]
+
+
+    #dy_class_form=forms.CustomerModelForm
+    model_form_class =  forms.create_model_form(request,admin_class)
+
+    obj = admin_class.model.objects.get(id=obj_id)
+    form_class= model_form_class(instance=obj)
+    return  render(request,"king_admin/table_obj_change.html",{"form_class":form_class})

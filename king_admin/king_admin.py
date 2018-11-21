@@ -20,7 +20,7 @@ class CustomerAdmin(BaseAdmin):
 
 
 class CustomerFollowUpAdmin(BaseAdmin):
-    list_display = ('customer','consultant','date')
+    list_display = ("id",'customer','consultant','date')
 
 def register(model_class,admin_class=None):
     if model_class._meta.app_label not in enable_admins:

@@ -9,12 +9,18 @@ class CustomerAdmin(admin.ModelAdmin):
     filter_horizontal = ('tags',)
     list_editable = ('status',)
 
+class CustomerFollowUpAdmin(admin.ModelAdmin):
+    list_display = ('id',"customer",'consultant','content','date')
+
+
+
+
 admin.site.register(models.Customer,CustomerAdmin)
 admin.site.register(models.Branch)
 admin.site.register(models.ClassList)
 admin.site.register(models.Course)
 admin.site.register(models.CourseRecord)
-admin.site.register(models.CustomerFollowUp)
+admin.site.register(models.CustomerFollowUp,CustomerFollowUpAdmin)
 admin.site.register(models.Enrollment)
 admin.site.register(models.Payment)
 admin.site.register(models.Role)

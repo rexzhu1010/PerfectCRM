@@ -37,7 +37,7 @@ class Customer(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.qq
+        return self.name
 
     class Meta:
         verbose_name = "客户表"            #在django中表名显示中文，只加这个会显示客户表s ,
