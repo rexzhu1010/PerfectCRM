@@ -233,3 +233,41 @@ def render_filter_ele(condtion,admin_class,filter_condtions,selectdate):
 
     select_ele += "</select>"
     return mark_safe(select_ele)
+
+
+@register.simple_tag
+def get_model_name(admin_class):
+
+    return  admin_class.model._meta.verbose_name
+
+
+
+@register.simple_tag
+def get_m2m_obj_list(admin_class,field,form_obj):
+    #返回select 中待选数据, 这里field 没有写死，适合所有
+
+    all_obj_list = getattr(admin_class.model,field.name).rel.model.objects.all()  #表结构中取出 的  所有select数据
+    print("我是  get_m2m_obj_list")
+
+    if not form_obj.instance.id:
+        print("我是  get_m2m_obj_list")
+        return all_obj_list
+
+    selected_obj_list = getattr(form_obj.instance, field.name).all()  # 单条数据  已选select数据
+
+    standy_obj_list = []
+    for  obj  in all_obj_list:
+        if obj  not in selected_obj_list:
+            standy_obj_list.append(obj)
+
+    return standy_obj_list
+
+@register.simple_tag
+def get_m2m_selected_list(form_obj,field):
+    #返回已选择的M2m 数据
+    if not form_obj.instance.id:
+        return None
+    selected_obj=getattr(form_obj.instance,field.name).all()
+    print("selected:",selected_obj)
+    return  selected_obj
+

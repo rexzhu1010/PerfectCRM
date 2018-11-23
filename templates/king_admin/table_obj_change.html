@@ -1,35 +1,100 @@
 {%  extends 'king_admin/table_index.html' %}
 {% load tags %}
-
-
-
+ {%  block extra-css-resources %}
+     <style type="text/css" >
+            .filter-select-box{
+                height:250px!important;
+                width: 100% ;
+            }
+     </style>
+ {% endblock %}
 
 {% block container %}
-            change
-
-
-
-        <form class="form-horizontal" method="post">
-        {% for field in form_class %}
+        change
+        <form class="form-horizontal" method="post" onsubmit="return SelectAllChosenData()">{%  csrf_token %}
+            <span style="color: red"> {{ form_obj.errors}}</span>
+        {% for field in form_obj %}
                 <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">
+                <label for="inputEmail3" class="col-sm-2 control-label" style="font-weight: normal">
                     {% if field.field.required %}
-                        {{ field.label }}
+                        <b> {{ field.label }} </b>
                     {% else %}
                         {{ field.label }}
                     {% endif %}
                 </label>
-                <div class="col-sm-10">
+                <div class="col-sm-6">
 {#                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
-                   {{field}}
+                    {% if  field.name in admin_class.filter_horizontal %}
+                        <div class="col-md-5">
+                            {% get_m2m_obj_list  admin_class field  form_obj as m2m_obj_list %}   {#所有可选项#}
+                            <select id="id_{{ field.name }}_form" multiple  class="filter-select-box">
+                               {% for obj in  m2m_obj_list %}
+{#                                   <option   value="{{obj.id}}">{{ obj.name }}</option>#}
+                                    <option  ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_form')" value="{{ obj.id}}">{{ obj.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-1">箭头</div>
+
+                        <div class="col-md-5">
+                           {% get_m2m_selected_list form_obj field as selected_obj_list %}
+                            <select  tag='chosen_list' id="id_{{ field.name }}_to" multiple class="filter-select-box" name="tags">
+{#                             {% for o in  form_obj.instance.tags.all %}   这里写死了tags #}
+{#                                 <option value="{{ o.id  }}">{{ o }}</option>#}
+{#                             {% endfor %}#}
+                             {% for o in  selected_obj_list %}
+                                 <option  ondblclick="MoveElementTo(this,'id_{{ field.name }}_form','id_{{ field.name }}_to')"  value="{{ o.id  }}">{{ o }}</option>
+                             {% endfor %}
+                            </select>
+
+                        </div>
+
+
+                    {% else %}
+                         {{field}}
+                    {% endif %}
+
                 </div>
                 </div>
         {% endfor %}
             <div class="form-group col-sm-2 pull-right" >
 
                 <button type="submit" class="btn btn-success">Save</button>
+
+
             </div>
         </form>
+
+    <button onclick=SelectAllChosenData()  class="btn btn-success">test</button>
+    <script>
+            function MoveElementTo(ele,target_id,new_target_id) {
+                var opt_ele = "<option value='"+$(ele).val() +"'  ondblclick=\"MoveElementTo(this,'"+ new_target_id + "','"+ target_id + "')\"  >"+$(ele).text() +"</option>"
+                $("#"+target_id).append(opt_ele)
+                $(ele).remove()
+            }
+
+
+
+    {#function SelectAllChosenData() {#}
+    {##}
+    {#    $("select[tag='chosen_list'] option").each(function () {#}
+    {#        $(this).prop("selected",true);#}
+    {#    })#}
+    {#    return true;#}
+
+
+        function SelectAllChosenData() {
+
+        $("#id_tags_to option").each(function () {
+            {#$(this).prop("selected",true);#}
+            $(this).attr("selected",true);
+        })
+        return true;
+      }
+
+
+    </script>
 {% endblock %}
 
 

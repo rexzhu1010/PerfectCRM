@@ -11,7 +11,7 @@ import pymysql
 class Customer(models.Model):
     #"客户信息表"
     name =models.CharField(max_length=32,null=True,blank=True)
-    qq = models.CharField(max_length=64,blank=True,null=True)
+    qq = models.CharField(max_length=64,unique=True)
     qq_name = models.CharField(max_length=64,blank=True,null=True)
     phone = models.CharField(max_length=64,blank=True,null=True)
     source_choices = ( (0,'转介绍'),

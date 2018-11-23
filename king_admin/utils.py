@@ -13,8 +13,14 @@ def table_filter(request,admin_class):
         if v:
             filter_conditions[k] =v
 
-    #根据过滤条件查询数据库
-    return admin_class.model.objects.filter(**filter_conditions),filter_conditions
+    #看是否有默认排序
+    if admin_class.ordering:
+        ordering = admin_class.ordering
+    else:
+        ordering = "-id"
+
+    # 根据过滤条件查询数据库
+    return admin_class.model.objects.filter(**filter_conditions).order_by(ordering),filter_conditions
 
 def table_sort(request,objs):
     orderby_key = request.GET.get("o")
