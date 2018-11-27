@@ -9,8 +9,13 @@ class CustomerAdmin(admin.ModelAdmin):
     filter_horizontal = ('tags',)
     list_editable = ('status',)
 
+    actions = ("Test_action",)
+    def Test_action(self,arg1,arg2):
+        print("test action:",self,arg1,arg2)
+
 class CustomerFollowUpAdmin(admin.ModelAdmin):
     list_display = ('id',"customer",'consultant','content','date')
+
 
 
 

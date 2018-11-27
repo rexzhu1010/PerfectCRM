@@ -54,7 +54,7 @@ class Tag(models.Model):
         verbose_name_plural = "标签"
 
     def __str__(self):
-        return  self.name
+        return self.name
 
 
 class CustomerFollowUp(models.Model):
@@ -181,7 +181,7 @@ class StudyRecord(models.Model):
     date  = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return "%s %s"%(self.student,self.course_record,self.score)
+        return "%s %s %s"%(self.student,self.course_record,self.score)
 
     class Meta:
         unique_together = ("student","course_record")
@@ -200,7 +200,7 @@ class Enrollment(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "%s %s"%(self.coustomer,self.Enrollment_class)
+        return "%s %s"%(self.customer,self.enrollment_class)
 
     class Meta:
         unique_together = ("customer","enrollment_class")
@@ -222,7 +222,8 @@ class Payment(models.Model):
         verbose_name = "缴费表"  # 在django中表名显示中文，只加这个会显示客户表s ,
         verbose_name_plural = "缴费表"  # 加上这和把s 去掉
 
-
+    def __str__(self):
+        return "<%s %s>"%(self.customer,self.amount)
 
 
 class UserProfile(models.Model):

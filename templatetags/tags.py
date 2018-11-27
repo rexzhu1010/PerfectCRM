@@ -271,3 +271,124 @@ def get_m2m_selected_list(form_obj,field):
     print("selected:",selected_obj)
     return  selected_obj
 
+
+@register.simple_tag
+def display_obj_related(obj):
+    html= "<ul><li>%s : </li>" % (obj._meta.verbose_name)
+    html_ele = recursive_related_objs_lookup(obj)
+    html+=html_ele
+    html+="</ul>"
+    return mark_safe(html)
+
+
+
+
+def recursive_related_objs_lookup(obj):
+
+    html_ele=""
+    temp_ele=""
+    for otm_obj in obj._meta.related_objects:   #循环对像中 有关联的表
+        # if "ManyToOneRel" not in otm_obj.__repr__():
+        #     continue
+        if hasattr(otm_obj,"get_accessor_name"):
+           temp_set_name = otm_obj.get_accessor_name()
+           print("temp_set_name:",temp_set_name)
+           if getattr(obj, temp_set_name).all() :
+               temp_ele += "<ul>"
+
+               for i in getattr(obj,temp_set_name).all():
+                   temp_ele += "<li>%s : %s</li>  "%(i._meta.verbose_name,i)
+                   # print(html_ele)
+                   if len(i._meta.related_objects) > 0 :
+                            temp_ele += recursive_related_objs_lookup(i)
+
+               temp_ele += "</ul>"
+           else:
+               print("temp_set_name 是空的:", temp_set_name)
+               continue
+
+               # break
+
+        # break
+
+    if (len(obj._meta.local_many_to_many) > 0):
+        temp_ele += "<ul>"
+        for mtm_obj in obj._meta.local_many_to_many:
+
+            v = getattr(obj, mtm_obj.name).all()  # = getattr(customer,tags).all()
+
+            for i in v:
+                temp_ele += "<li>%s : %s</li>" % (mtm_obj.name, i)
+                # if len(i._meta.local_many_to_many) > 0:
+                #     html_ele = recursive_related_objs_lookup(i, html_ele)
+        temp_ele += "</ul>"
+
+    html_ele+=temp_ele
+
+
+
+
+    return html_ele
+
+
+
+
+def recursive_related_objs_lookup2(objs):
+    #model_name = objs[0]._meta.model_name
+    ul_ele = "<ul>"
+    for obj in objs:
+        li_ele = '''<li> %s: %s </li>'''%(obj._meta.verbose_name,obj.__str__().strip("<>"))
+        ul_ele += li_ele
+
+        #for local many to many
+        #print("------- obj._meta.local_many_to_many", obj._meta.local_many_to_many)
+        for m2m_field in obj._meta.local_many_to_many: #把所有跟这个对象直接关联的m2m字段取出来了
+            sub_ul_ele = "<ul>"
+            m2m_field_obj = getattr(obj,m2m_field.name) #getattr(customer, 'tags')
+            for o in m2m_field_obj.select_related():# customer.tags.select_related()
+                li_ele = '''<li> %s: %s </li>''' % (m2m_field.verbose_name, o.__str__().strip("<>"))
+                sub_ul_ele +=li_ele
+
+            sub_ul_ele += "</ul>"
+            ul_ele += sub_ul_ele  #最终跟最外层的ul相拼接
+
+
+        for related_obj in obj._meta.related_objects:
+            if 'ManyToManyRel' in related_obj.__repr__():
+
+                if hasattr(obj, related_obj.get_accessor_name()):  # hassattr(customer,'enrollment_set')
+                    accessor_obj = getattr(obj, related_obj.get_accessor_name())
+                    print("-------ManyToManyRel",accessor_obj,related_obj.get_accessor_name())
+                    # 上面accessor_obj 相当于 customer.enrollment_set
+                    if hasattr(accessor_obj, 'select_related'):  # slect_related() == all()
+                        target_objs = accessor_obj.select_related()  # .filter(**filter_coditions)
+                        # target_objs 相当于 customer.enrollment_set.all()
+
+                        sub_ul_ele ="<ul style='color:red'>"
+                        for o in target_objs:
+                            li_ele = '''<li> %s: %s </li>''' % (o._meta.verbose_name, o.__str__().strip("<>"))
+                            sub_ul_ele += li_ele
+                        sub_ul_ele += "</ul>"
+                        ul_ele += sub_ul_ele
+
+            elif hasattr(obj,related_obj.get_accessor_name()): # hassattr(customer,'enrollment_set')
+                accessor_obj = getattr(obj,related_obj.get_accessor_name())
+                #上面accessor_obj 相当于 customer.enrollment_set
+                if hasattr(accessor_obj,'select_related'): # slect_related() == all()
+                    target_objs = accessor_obj.select_related() #.filter(**filter_coditions)
+                    # target_objs 相当于 customer.enrollment_set.all()
+                else:
+                    print("one to one i guess:",accessor_obj)
+                    target_objs = accessor_obj
+
+                if len(target_objs) >0:
+                    #print("\033[31;1mdeeper layer lookup -------\033[0m")
+                    #nodes = recursive_related_objs_lookup(target_objs,model_name)
+                    nodes = recursive_related_objs_lookup(target_objs)
+                    ul_ele += nodes
+    ul_ele +="</ul>"
+    return ul_ele
+
+
+
+

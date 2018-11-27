@@ -59,14 +59,15 @@
                 </div>
         {% endfor %}
             <div class="form-group col-sm-2 pull-right" >
-
                 <button type="submit" class="btn btn-success">Save</button>
-
+            </div>
+             <div class="form-group col-sm-2 pull-left" >
+                <a  class="btn btn-danger" href="{% url "obj_delete" app_name table_name form_obj.instance.id %}">Delete</a>
 
             </div>
         </form>
 
-    <button onclick=SelectAllChosenData()  class="btn btn-success">test</button>
+
     <script>
             function MoveElementTo(ele,target_id,new_target_id) {
                 var opt_ele = "<option value='"+$(ele).val() +"'  ondblclick=\"MoveElementTo(this,'"+ new_target_id + "','"+ target_id + "')\"  >"+$(ele).text() +"</option>"

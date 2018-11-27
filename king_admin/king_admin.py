@@ -33,6 +33,9 @@ def register(model_class,admin_class=None):
     enable_admins[model_class._meta.app_label][model_class._meta.model_name] =  admin_class
 
 
+class UserProfileAdmin(BaseAdmin):
+    list_display = ("user","name")
 
 register(models.Customer,CustomerAdmin)
 register(models.CustomerFollowUp,CustomerFollowUpAdmin)
+register(models.UserProfile,UserProfileAdmin)
