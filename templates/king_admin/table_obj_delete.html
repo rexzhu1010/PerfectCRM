@@ -4,15 +4,14 @@
 
 {% block container %}
 
-    {% display_obj_related obj %}
-
-
-
+    {% display_obj_related objs %}
     <form method="post">{% csrf_token %}
         <input type="submit" class="btn btn-danger" value="Yes,I'm sure">
-{#        {{ app_name }}{{ table_name }}#}
+        <input type="hidden" value="yes" name="delete_confirm">
+        <input type="hidden" value="{{ selected_ids }}" name="selected_ids">
+        <input type="hidden" value="{{ action }}" name="action">
         <a class="btn-info btn" href="{% url "table_objs" app_name table_name %}">No take me back</a>
-{#        <a class="btn-info btn" href="/king_admin/crm/customer/">No take me back</a>#}
     </form>
+
 {% endblock %}
 

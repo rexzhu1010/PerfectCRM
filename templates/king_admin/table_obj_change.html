@@ -16,20 +16,24 @@
         {% for field in form_obj %}
                 <div class="form-group">
                 <label for="inputEmail3" class="col-sm-2 control-label" style="font-weight: normal">
+                    {#判断是否为必要字段#}
                     {% if field.field.required %}
                         <b> {{ field.label }} </b>
                     {% else %}
                         {{ field.label }}
                     {% endif %}
                 </label>
+
+
                 <div class="col-sm-6">
-{#                  <input type="email" class="form-control" id="inputEmail3" placeholder="Email">#}
+
+                    {#判断处理choices 字段#}
                     {% if  field.name in admin_class.filter_horizontal %}
                         <div class="col-md-5">
                             {% get_m2m_obj_list  admin_class field  form_obj as m2m_obj_list %}   {#所有可选项#}
                             <select id="id_{{ field.name }}_form" multiple  class="filter-select-box">
                                {% for obj in  m2m_obj_list %}
-{#                                   <option   value="{{obj.id}}">{{ obj.name }}</option>#}
+
                                     <option  ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_form')" value="{{ obj.id}}">{{ obj.name }}</option>
                                 {% endfor %}
                             </select>
@@ -49,21 +53,24 @@
                             </select>
 
                         </div>
-
-
                     {% else %}
+{#                        普通字段非choices#}
                          {{field}}
                     {% endif %}
-
                 </div>
                 </div>
         {% endfor %}
+
+{#以下是按扭#}
             <div class="form-group col-sm-2 pull-right" >
                 <button type="submit" class="btn btn-success">Save</button>
             </div>
              <div class="form-group col-sm-2 pull-left" >
+{#如果是add 就没有删除功能#}
+                 {% if app_name %}
+{#change 才有下面的代码  #}
                 <a  class="btn btn-danger" href="{% url "obj_delete" app_name table_name form_obj.instance.id %}">Delete</a>
-
+                {% endif %}
             </div>
         </form>
 
@@ -77,13 +84,6 @@
 
 
 
-    {#function SelectAllChosenData() {#}
-    {##}
-    {#    $("select[tag='chosen_list'] option").each(function () {#}
-    {#        $(this).prop("selected",true);#}
-    {#    })#}
-    {#    return true;#}
-
 
         function SelectAllChosenData() {
 
@@ -91,7 +91,13 @@
             {#$(this).prop("selected",true);#}
             $(this).attr("selected",true);
         })
-        return true;
+
+            $("form").find("[disabled]").removeAttr("disabled")
+
+
+        return;
+
+
       }
 
 

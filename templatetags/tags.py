@@ -273,12 +273,21 @@ def get_m2m_selected_list(form_obj,field):
 
 
 @register.simple_tag
-def display_obj_related(obj):
-    html= "<ul><li>%s : </li>" % (obj._meta.verbose_name)
-    html_ele = recursive_related_objs_lookup(obj)
-    html+=html_ele
-    html+="</ul>"
-    return mark_safe(html)
+def display_obj_related(objs):
+
+
+    html_ele=""
+
+    for obj in objs:
+        html_ele += "<ul><li>%s :%s</li>" % (obj._meta.verbose_name,obj)
+        html_ele += recursive_related_objs_lookup(obj)
+        html_ele +="</ul>"
+
+
+
+
+
+    return mark_safe(html_ele)
 
 
 
@@ -292,7 +301,7 @@ def recursive_related_objs_lookup(obj):
         #     continue
         if hasattr(otm_obj,"get_accessor_name"):
            temp_set_name = otm_obj.get_accessor_name()
-           print("temp_set_name:",temp_set_name)
+
            if getattr(obj, temp_set_name).all() :
                temp_ele += "<ul>"
 
