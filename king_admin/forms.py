@@ -1,5 +1,8 @@
 # rex.zhu
 from  django.forms import forms,ModelForm
+from king_admin import utils
+from django.forms import  ValidationError
+from  django.utils.translation import  ugettext as _
 
 from crm import  models
 
@@ -26,16 +29,71 @@ def  create_model_form(request,admin_class):
                  field_obj.widget.attrs['class'] = 'form-control'
                  # print(field_name,field_obj)
                  # field_obj.widget.attrs['maxlength'] = getattr(field_obj,"max_length") if hasattr(field_obj,"max_length") else ""
-                 print(admin_class.readonly_fields)
-                 if field_name in  admin_class.readonly_fields:
-                     field_obj.widget.attrs['disabled']="disabled"
+
+                 if not admin_class.is_add_form:
+                     if field_name in  admin_class.readonly_fields:
+                         field_obj.widget.attrs['disabled']="disabled"
+
+                 if hasattr(admin_class, "clean_%s" % field_name):
+                     field_clean_func = getattr(admin_class, "clean_%s" % field_name)
+                     setattr(cls, "clean_%s" % field_name, field_clean_func)
+
+
+
 
             return ModelForm.__new__(cls)
 
+    def  defaut_clean(self):
+
+
+        #给所有的form 加一个 form  只读认证"
+        print("保存前 cleaned_data:", self.cleaned_data)
+        print("-----------running default clean")
+        error_list=[]
+        #如果是修改，做以下验证，验证只读字段，不能修改
+        if self.instance.id:
+            for filed in admin_class.readonly_fields:
+                filed_val =  getattr(self.instance,filed)
+                filed_frontend_val =self.cleaned_data.get(filed)
+                # print(filed_val,filed_frontend_val)
+
+                #如果是多对多
+                if hasattr(filed_val,"select_related"):
+                    print(set(filed_val.all()),set(filed_frontend_val))
+                    if set(filed_val.all()) != set(filed_frontend_val) :
+                        print("we are not same!!!!!!!")
+                        if filed_frontend_val != filed_val:
+                            self.add_error(filed,"%s cat not change"%filed)
+                    continue
+
+                #普通字段
+                if filed_frontend_val != filed_val:
+                    error_list.append( ValidationError(
+                            _('Field %(filed)s is readonly ,data should be %(val)s'),
+                            code="invalid",
+                            params={"filed":filed,"val":filed_val},)
+                    )
+
+
+
+
+            response = admin_class.default_form_validation(self)
+            if response:
+                    error_list.append(response)
+            if error_list:
+                raise ValidationError(error_list)
+    #     # print(self.instance,request.POST)
+    #
+    #     #invoke user's cutomized form validation
+
+
     attrs = {"Meta":Meta}
     #创建动态类
+
+
     model_class = type("DynamicModelClass",(ModelForm,),attrs)
     setattr(model_class,"__new__",__new__)
+    setattr(model_class,"clean",defaut_clean)
     return  model_class
 
 

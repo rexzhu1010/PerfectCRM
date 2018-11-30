@@ -85,12 +85,15 @@ def display_table_objs(request,app_name,table_name):
 
 def table_objs_change(request,app_name,table_name,obj_id):
     admin_class = king_admin.enable_admins[app_name][table_name]
+    admin_class.is_add_form = False
     model_form_class =  forms.create_model_form(request,admin_class)
     obj = admin_class.model.objects.get(id=obj_id)
     if request.method == "POST":
         form_obj=model_form_class(request.POST,instance=obj) # 把新POST，和旧的OBJ 都交给 modelform 对比 才是更新
         #orm_obj = model_form_class(request.POST) #这不是更新，这是增加
+
         if form_obj.is_valid():
+            print("保存前 cleaned_data:",form_obj.cleaned_data)
             form_obj.save()
     else:
         form_obj= model_form_class(instance=obj)
@@ -99,6 +102,7 @@ def table_objs_change(request,app_name,table_name,obj_id):
 def table_objs_add(request,app_name,table_name):
     print("add")
     admin_class = king_admin.enable_admins[app_name][table_name]
+    admin_class.is_add_form =  True
     model_form_class =  forms.create_model_form(request,admin_class)
 
     if request.method == "POST":
@@ -106,6 +110,7 @@ def table_objs_add(request,app_name,table_name):
         form_obj=model_form_class(request.POST) # 把新POST，和旧的OBJ 都交给 modelform 对比 才是更新
 
         if form_obj.is_valid():
+            print(form_obj)
             form_obj.save()
             return redirect(request.path.replace("/add/","/"))
 

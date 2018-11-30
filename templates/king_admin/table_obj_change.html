@@ -32,10 +32,15 @@
                         <div class="col-md-5">
                             {% get_m2m_obj_list  admin_class field  form_obj as m2m_obj_list %}   {#所有可选项#}
                             <select id="id_{{ field.name }}_form" multiple  class="filter-select-box">
+                            {% if field.name in admin_class.readonly_fields and not admin_class.is_add_form %}
+                                {% for obj in  m2m_obj_list %}
+                                    <option disabled>{{ obj.name }}</option>
+                                {% endfor %}
+                             {% else %}
                                {% for obj in  m2m_obj_list %}
-
                                     <option  ondblclick="MoveElementTo(this,'id_{{ field.name }}_to','id_{{ field.name }}_form')" value="{{ obj.id}}">{{ obj.name }}</option>
                                 {% endfor %}
+                            {% endif %}
                             </select>
                         </div>
 
@@ -47,15 +52,22 @@
 {#                             {% for o in  form_obj.instance.tags.all %}   这里写死了tags #}
 {#                                 <option value="{{ o.id  }}">{{ o }}</option>#}
 {#                             {% endfor %}#}
+                        {% if field.name in admin_class.readonly_fields  and not admin_class.is_add_form %}
+                             {% for o in  selected_obj_list %}
+                                 <option   value="{{ o.id  }}">{{ o }}</option>
+                             {% endfor %}
+                        {%  else%}
                              {% for o in  selected_obj_list %}
                                  <option  ondblclick="MoveElementTo(this,'id_{{ field.name }}_form','id_{{ field.name }}_to')"  value="{{ o.id  }}">{{ o }}</option>
                              {% endfor %}
+                        {% endif %}
                             </select>
+                            <span style="color: red">{{ field.errors }}</span>
 
                         </div>
                     {% else %}
 {#                        普通字段非choices#}
-                         {{field}}
+                        {{field}}<span style="color: red">{{ field.errors }}</span>
                     {% endif %}
                 </div>
                 </div>
