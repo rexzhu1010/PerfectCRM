@@ -19,7 +19,8 @@ def  create_model_form(request,admin_class):
     class Meta:
         model =  admin_class.model
         fields = "__all__"
-
+        # exclude = ("qq",)
+        exclude = admin_class.form_exclude_field
 
     #这里自定义 __new__方法，用来生成类时使用
     #__new__是在新式类中新出现的方法，它作用在构造方法建造实例之前，在这里可以自定义修改类中内容，比如给modelform 增加 css，修改CSS
@@ -44,14 +45,21 @@ def  create_model_form(request,admin_class):
             return ModelForm.__new__(cls)
 
     def  defaut_clean(self):
-
-
-        #给所有的form 加一个 form  只读认证"
+        #这个默认验证是给所有的form 加一个 form  只读认证"
         print("保存前 cleaned_data:", self.cleaned_data)
         print("-----------running default clean")
         error_list=[]
         #如果是修改，做以下验证，验证只读字段，不能修改
+
+        if admin_class.readonly_table :
+            print("这个是只读table")
+            raise  ValidationError(
+                _('Table is readonly '),
+                code="invalid",
+                params={}, )
+
         if self.instance.id:
+            print("这个form 表单有 instance")
             for filed in admin_class.readonly_fields:
                 filed_val =  getattr(self.instance,filed)
                 filed_frontend_val =self.cleaned_data.get(filed)
@@ -82,6 +90,8 @@ def  create_model_form(request,admin_class):
                     error_list.append(response)
             if error_list:
                 raise ValidationError(error_list)
+
+        print("--------end default clean")
     #     # print(self.instance,request.POST)
     #
     #     #invoke user's cutomized form validation
@@ -94,6 +104,7 @@ def  create_model_form(request,admin_class):
     model_class = type("DynamicModelClass",(ModelForm,),attrs)
     setattr(model_class,"__new__",__new__)
     setattr(model_class,"clean",defaut_clean)
+
     return  model_class
 
 

@@ -4,6 +4,8 @@ from django.shortcuts import render
 
 
 def index(request):
+    print("我是crm ...........................")
+
     return render(request,"index.html")
 
 

@@ -5,6 +5,12 @@
 {% block container %}
 
     {% display_obj_related objs %}
+
+    <ul >
+        {% for i in errors %}
+            <li style="color:red">{{ i }}</li>
+        {% endfor %}
+    </ul>
     <form method="post">{% csrf_token %}
         <input type="submit" class="btn btn-danger" value="Yes,I'm sure">
         <input type="hidden" value="yes" name="delete_confirm">

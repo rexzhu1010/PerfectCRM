@@ -6,6 +6,7 @@ from django.utils.safestring import mark_safe
 from king_admin.utils import prn_obj
 from django.utils.timezone import datetime,timedelta
 register = template.Library()
+from django.core.exceptions import FieldDoesNotExist
 
 @register.simple_tag
 def render_app_name(admin_class):
@@ -22,39 +23,30 @@ def build_table_row(request,obj,admin_class):
     # print("11111111111")
     row_ele = ""
     for index,column in enumerate(admin_class.list_display):
-        #obj为全部字段结果，column为需要显示的字段
-        field_obj = obj._meta.get_field(column)
-        # print("222222")
-        # prn_obj(field_obj)
-        # print("222222")
+        #obj为一行数据全部字段结果，column为需要显示的字段
+        try:
+            field_obj = obj._meta.get_field(column)
 
+            if field_obj.choices:#choices type
+                column_data = getattr(obj,"get_%s_display" % column)()
+            else:
+                column_data = getattr(obj,column)
+            if type(column_data).__name__ == 'datetime':
+                column_data = column_data.strftime("%Y-%m-%d %H:%M:%S")
+            if index == 0:  # 在第一列增加 a 标签，跳到change
+               column_data = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,obj_id=obj.id,data=column_data)
 
-        if field_obj.choices:#choices type
-            column_data = getattr(obj,"get_%s_display" % column)()
-            # print("55555555555555")
-            # print(column,obj.get_status_display)
-            # print("55555555555555")
-            # # print("%s 3333333333"%column)
-            #
-            # print(dir(obj._meta))
-            # print(column_data)
-            #
-            # print("%s 33333333333"%column)
-        else:
-            column_data = getattr(obj,column)
-        # print(type(column_data))
-        if type(column_data).__name__ == 'datetime':
-            # print(1111111)
-            # print(type(column_data))
-            # # prn_obj(column_data)
-            # print(1111111111)
-            column_data = column_data.strftime("%Y-%m-%d %H:%M:%S")
-
-        if index == 0:  # 在第一列增加 a 标签，跳到change
-
-           column_data = "<a href='{request_path}{obj_id}/change/'>{data}</a>".format(request_path=request.path,obj_id=obj.id,data=column_data)
-
+        #处理数据库里没有的 自定义字段
+        except FieldDoesNotExist as e:
+                if hasattr(admin_class,column):
+                    column_fun = getattr(admin_class,column)
+                    admin_class.instance = obj
+                    admin_class.request = request
+                    column_data =  column_fun()
         row_ele += "<td>%s</td>" % column_data
+
+
+
 
     return mark_safe(row_ele)
 
@@ -131,9 +123,12 @@ def render_page_ele(loop_counter,query_sets,filter_condtions):
 
 
 @register.simple_tag
-def build_table_header_column(column, orderby_key,filter_condtions):
+def build_table_header_column(column, orderby_key,filter_condtions,admin_class):
     #< th > < ahref = "?o={% set_orderbykey column orderby_key %}" > {{column}}  < / a > < / th >
     #< spanclass ="glyphicon glyphicon-menu-down" aria-hidden="true" > < / span >
+
+
+
 
     filters = ""
     for k, v in filter_condtions.items():
@@ -153,8 +148,13 @@ def build_table_header_column(column, orderby_key,filter_condtions):
     else:
         orderby_key = column
         up_down=""
-
-    ele = ele.format(orderby_key=orderby_key,filters=filters,column=column,up_down=up_down)
+    try:
+        column_verbose_name = admin_class.model._meta.get_field(column).verbose_name
+    except FieldDoesNotExist as e:
+        column_verbose_name = getattr(admin_class,column).display_name
+        # return column_verbose_name
+        ele = mark_safe('''<th><a href="#">%s</a></th>'''%column_verbose_name)
+    ele = ele.format(orderby_key=orderby_key,filters=filters,column=column_verbose_name,up_down=up_down)
     return mark_safe(ele)
 
 

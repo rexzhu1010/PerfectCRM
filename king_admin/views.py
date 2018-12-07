@@ -19,8 +19,6 @@ def index(request):
 
 def display_table_objs(request,app_name,table_name):
 
-
-
     print("-->",app_name,table_name)
     #models_module = importlib.import_module('%s.models'%(app_name))
     #model_obj = getattr(models_module,table_name)
@@ -95,6 +93,8 @@ def table_objs_change(request,app_name,table_name,obj_id):
         if form_obj.is_valid():
             print("保存前 cleaned_data:",form_obj.cleaned_data)
             form_obj.save()
+            return redirect("/king_admin/%s/%s/" % (app_name, table_name))
+
     else:
         form_obj= model_form_class(instance=obj)
     return  render(request,"king_admin/table_obj_change.html",{"form_obj":form_obj,"admin_class":admin_class,"app_name":app_name,"table_name":table_name})
@@ -105,14 +105,19 @@ def table_objs_add(request,app_name,table_name):
     admin_class.is_add_form =  True
     model_form_class =  forms.create_model_form(request,admin_class)
 
+
     if request.method == "POST":
 
         form_obj=model_form_class(request.POST) # 把新POST，和旧的OBJ 都交给 modelform 对比 才是更新
 
+
         if form_obj.is_valid():
-            print(form_obj)
+            print("form表单验证成功后",form_obj)
             form_obj.save()
+            print("添加成功")
             return redirect(request.path.replace("/add/","/"))
+        else:
+            model_form_class = form_obj
 
     return  render(request,"king_admin/table_obj_add.html",{"form_obj":model_form_class,"admin_class":admin_class,})
 
@@ -122,9 +127,51 @@ def table_obj_delete(request,app_name,table_name,obj_id):
     # model_form_class  = forms.create_model_form(request,admin_class)
     obj =  admin_class.model.objects.get(id=obj_id)
     objs = [obj,]
+    errors={}
+    if admin_class.readonly_table:
+        # 如该表是只读
+        errors = {"readonly_table": "table is readonly [%s] cat not be delete" % table_name}
+    else:
+        errors={}
     if request.method == "POST":
-        print("是我是我是我是我是我是我是我是我是我是我")
-        obj.delete()
-        return redirect("/king_admin/%s/%s/"%(app_name,table_name))
+        if not admin_class.readonly_table:
+            obj.delete()
+            return redirect("/king_admin/%s/%s/"%(app_name,table_name))
 
-    return  render(request,"king_admin/table_obj_delete.html",{"objs":objs,"app_name":app_name,"table_name":table_name})
+
+
+    return  render(request,"king_admin/table_obj_delete.html",{"objs":objs,"app_name":app_name,"table_name":table_name,"errors":errors})
+
+
+
+def password_reset(request,app_name,table_name,obj_id):
+    admin_class =  king_admin.enable_admins[app_name][table_name]
+    obj =  admin_class.model.objects.get(id=obj_id)
+    errors = {}
+    if request.method == "POST":
+        _password1 =  request.POST.get("password1")
+        _password2 =  request.POST.get("password2")
+
+        if _password1 == _password2 :
+            if len(_password2) > 5:
+                obj.set_password(_password1)
+                obj.save()
+                print("1111111111111111",request.path.rstrip("password/"))
+                return redirect(request.path.rstrip("password/"))
+            else:
+                errors['ivalid_password'] = "must not less 6 letters"
+        else:
+            errors['ivvalid_password'] = 'passowrds are not the same'
+
+
+    return render(request,"king_admin/password_reset.html",{"obj":obj,"errors":errors})
+
+
+
+
+def enrollment(request,app_name,table_name,obj_id):
+    admin_class =  king_admin.enable_admins[app_name][table_name]
+    obj =  admin_class.model.objects.get(id=obj_id)
+    errors = {}
+
+    return render(request, "king_admin/enrollment.html", {"obj": obj, "errors": errors})

@@ -68,12 +68,14 @@
                     {% else %}
 {#                        普通字段非choices#}
                         {{field}}<span style="color: red">{{ field.errors }}</span>
+                        <span style="color: green">{{ field.help_text }}</span>
                     {% endif %}
                 </div>
                 </div>
         {% endfor %}
 
 {#以下是按扭#}
+{#            {% if not admin_class.readonly_table %}#}
             <div class="form-group col-sm-2 pull-right" >
                 <button type="submit" class="btn btn-success">Save</button>
             </div>
@@ -84,6 +86,7 @@
                 <a  class="btn btn-danger" href="{% url "obj_delete" app_name table_name form_obj.instance.id %}">Delete</a>
                 {% endif %}
             </div>
+{#            {% endif %}#}
         </form>
 
 

@@ -9,7 +9,9 @@
     <div class="panel panel-info">
           <div class="panel-heading">
             <h3 class="panel-title">{% get_model_name admin_class %}
+                {% if not admin_class.readonly_table %}
                 <a href="{{ request.path }}add/" class="pull-right">Add</a>
+                {% endif %}
             </h3>
           </div>
 
@@ -58,7 +60,7 @@
                     <tr>
                         <th width="35px"><input type="checkbox" onclick="CheckAllToggle(this)" ></th>
                         {% for column in admin_class.list_display %}
-                            {% build_table_header_column   column orderby_key filter_condtions %}
+                            {% build_table_header_column   column orderby_key filter_condtions admin_class %}
                         {% endfor %}
                     </tr>
                   </thead>
@@ -133,12 +135,12 @@
 
                 if (selected_ids.length == 0){
                     alert("no object got selected!");
-                    return
+                    return false
                 }
 
                 if  (!selected_action){
                     alert("no selected_action got selected!")
-                    return
+                    return false
                 }
 
                var k='<input type="hidden" name="selected_ids" value="'+ selected_ids.toString() +'">'
