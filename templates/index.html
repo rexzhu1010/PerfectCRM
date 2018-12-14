@@ -1,5 +1,9 @@
 
 {% extends 'base.html' %}
+ {%  block extra-css-resources %}
+        css
+ {% endblock %}
+
 {% block body %}
   <body>
 
@@ -14,11 +18,22 @@
           </button>
           <a class="navbar-brand" href="#">Project name</a>
         </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">{{ request.user }}</a></li>
-          </ul>
-        </div>
+
+
+          <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+
+        <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">{{ request.user.name }} <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">配置</a></li>
+                 <li><a href="{% url 'acc_logout' %}">注销</a></li>
+              </ul>
+        </li>
+      </ul>
+    </div>
+
+</div>
       </div>
     </nav>
 
@@ -27,30 +42,31 @@
         <div class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
             <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
-              sdfadfasd
-{#              {% for role in  request.user.userprofile.roles.all %}#}
-{#                  {% for menu in role.menus.all %}#}
-{#                      {% if menu.url_type == 0 %}#}
-{#                          <li><a href="{{ menu.name }}">{{ menu.name }}</a></li>#}
-{#                      {% elif  menu.url_type == 1 %}#}
-{#                           <li><a href="{{  menu.url_name }}" target="right_main">{{ menu.name }}</a></li>#}
-{#                      {% endif %}#}
-{##}
-{#                  {% endfor  %}#}
-{#              {% endfor %}#}
+
+              {% for role in  request.user.roles.all %}
+                  {% for menu in role.menus.all %}
+                      {% if menu.url_type == 0 %}
+                          <li><a href="{{ menu.url_name }}">{{ menu.name }}</a></li>
+                      {% elif  menu.url_type == 1 %}
+                           <li><a href="{{  menu.url_name }}" target="right_main">{{ menu.name }}</a></li>
+                      {% endif %}
+                  {% endfor  %}
+              {% endfor %}
 
           </ul>
 
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1 class="page-header">Dashboard</h1>
-            <iframe id="right_main" name="right_main"   frameborder="0" style="width:100%; height:800px; ">
-{#            {% block page-content %}#}
-{##}
-{##}
-{##}
-{#            {% endblock %}#}
-            </iframe>
+{#            <iframe id="right_main" name="right_main"   frameborder="0" style="width:100%; height:800px; ">#}
+{#            </iframe>#}
+
+            {% block page-content %}
+
+                                dddddddddd
+
+            {% endblock %}
+
 
         </div>
       </div>

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% load tags %}
+
+
+
+
+
+
+
+
+
+    {%  block extra-css-resources %}
+        <link href="/static/plugins/dropzone/dropzone.css" rel="stylesheet">
+    {% endblock %}
+
+{% block body %}
+
+
+    <div class = "container col-lg-8 col-md-offset-2 " >
+
+
+        <div class="panel panel-success">
+              <div class="panel-heading">
+                <h3 class="panel-title">入学报名</h3>
+              </div>
+              <div class="panel-body">
+                    {%  if status != 1 %}
+                    <form id="reg" class="form-horizontal" role="form" onsubmit="return RegisterFormCheck()" method="post">
+                        <span style="color: red">{{ customer_form.errors }}</span>
+                        {% for field in  customer_form %}
+                              <div class="form-group">
+                                <label  class="col-sm-2 control-label">{{ field.label }}</label>
+                                <div class="col-sm-9">
+                                  {{ field }}
+                                </div>
+                              </div>
+                        {% endfor %}
+                        <hr>
+                        <div class="form-group">
+                                <label  class="col-sm-2 control-label">所报班级</label>
+                                <div class="col-sm-9">
+                                  {{ enroll_obj.enrollment_class}}
+                                </div>
+                        </div>
+
+                        <div class="form-group">
+                                <label  class="col-sm-2 control-label">课程费用</label>
+                                <div class="col-sm-9">
+                                {{ enroll_obj.enrollment_class.course.price}}
+                                </div>
+                        </div>
+
+                        <div class="form-group">
+                                <label  class="col-sm-2 control-label">开课日期</label>
+                                <div class="col-sm-9">
+                                   {{ enroll_obj.enrollment_class.start_date}}"
+                                </div>
+                        </div>
+
+
+                        <div class="form-group">
+                                <label  class="col-sm-2 control-label">课程合同</label>
+                                <div class="col-sm-9">
+                                    <pre style="height: 600px;overflow: auto">{% render_enroll_contract enroll_obj %}</pre>
+                                </div>
+                        </div>
+
+                        <div class="form-group">
+                                <div class="col-sm-9  col-md-offset-2">
+                                    <input type="checkbox" name="contract_agreed" >我已认真阅读完协议并接受所有条款
+                                </div>
+                        </div>
+                    <div class="form-group">
+                                <div class="col-sm-9 col-md-offset-4">
+                                    <input type="submit" class="btn-info btn pull-left col-md-offset-2" value="提交">
+                                </div>
+                    </div>
+                    </form>
+
+                    <hr>
+
+                    <p>请上传你的身份证图片</p>
+                    <form action="/file-upload" style="border:1px dashed lightblue;height: 250px" class="dropzone form-horizontal"  role="form" id="my-awesome-dropzone">
+                      <div class="fallback form-group">
+                          <div class="col-sm-9  col-md-offset-2">
+                        <input name="file" type="file" multiple />
+                          </div>
+                      </div>
+                    </form>
+
+                    {% else %}
+                        <h2> 感谢，报名表已提交，你的合同很快被审核。</h2>
+                    {% endif %}
+              </div>
+            </div>
+    </div>
+
+    <script>
+            function RegisterFormCheck() {
+                   if ( $("form :checkbox").prop("checked")){
+                       $('form[id=reg] :input[disabled]').removeAttr('disabled')
+                       return True;
+                   }else{
+                       alert("必须同意条款")
+                       return false
+                   }
+            }
+    </script>
+{% endblock %}

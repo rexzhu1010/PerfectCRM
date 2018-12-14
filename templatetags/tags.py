@@ -399,5 +399,7 @@ def recursive_related_objs_lookup2(objs):
     return ul_ele
 
 
-
+@register.simple_tag
+def render_enroll_contract(enroll_obj):
+    return enroll_obj.enrollment_class.contract.template.format(course=enroll_obj.enrollment_class.course,customer=enroll_obj.customer.name)
 

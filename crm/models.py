@@ -16,6 +16,8 @@ class Customer(models.Model):
     qq = models.CharField(max_length=64,unique=True,)
     qq_name = models.CharField(max_length=64,blank=True,null=True)
     phone = models.CharField(max_length=64,blank=True,null=True)
+    id_num = models.CharField(max_length=64,blank=True,null=True)
+    email = models.EmailField(verbose_name="常用邮箱",blank=True,null=True)
     source_choices = ( (0,'转介绍'),
                        (1,'QQ群'),
                        (2,'官网'),
@@ -115,6 +117,7 @@ class ClassList(models.Model):
                           (1,"面授(周末)"),
                           (2,"网络班"),
     )
+    contract =  models.ForeignKey("ContractTemplate",blank=True,null=True,on_delete=models.CASCADE)
     class_type =  models.SmallIntegerField(choices=class_type_choices,verbose_name="班级类型")
     semester = models.PositiveSmallIntegerField(verbose_name="学期")
     teachers = models.ManyToManyField("UserProfile")
@@ -287,7 +290,7 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     name = models.CharField(max_length=32)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
+    roles  =  models.ManyToManyField("Role",blank=True)
     objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'   #让哪个字段做用户名
@@ -346,7 +349,13 @@ class Menu(models.Model):
         return self.name
 
 
+class  ContractTemplate(models.Model):
+    '''合同模板'''
+    name =  models.CharField(verbose_name="合同名称",max_length=64)
+    template = models.TextField()
 
+    def __str__(self):
+        return self.name
 
 
 

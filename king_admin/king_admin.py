@@ -61,7 +61,7 @@ class CustomerAdmin(BaseAdmin):
 
     #自宝义字段，数据库里没有的
     def enroll(self):
-         return  '''<a href="%s/enrollment/">报名</a>'''%(self.instance.id)
+         return  '''<a href="/crm/customers/%s/enrollment/">报名</a>'''%(self.instance.id)
     enroll.display_name = "报名链接"
 
 

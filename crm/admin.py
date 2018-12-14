@@ -32,6 +32,10 @@ class CustomerAdmin(admin.ModelAdmin):
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user','name')
 
+
+class ContractTemplateAdmin(admin.ModelAdmin):
+    list_display = ('name',"template")
+
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
     fields, plus a repeated password."""
@@ -88,14 +92,14 @@ class UserProfileAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal', {'fields': ('name',)}),
-        ('Permissions', {'fields': ('is_admin','is_active',"groups","user_permissions")}),
+        ('Permissions', {'fields': ('is_admin','is_active',"groups","user_permissions","roles")}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'name', 'password1', 'password2')}
+            'fields': ('email', 'name', 'password1', 'password2',)}
         ),
     )
     search_fields = ('email',)
@@ -116,6 +120,8 @@ admin.site.register(models.Payment)
 admin.site.register(models.StudyRecord)
 admin.site.register(models.Tag)
 admin.site.register(models.Menu)
+admin.site.register(models.ContractTemplate,ContractTemplateAdmin)
+
 
 
 
