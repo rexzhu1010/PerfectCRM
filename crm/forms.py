@@ -40,3 +40,17 @@ class CustomerForm(ModelForm):
             if filed_frontend_val != filed_val:
                 self.add_error("__all__", "小样的，别乱改！！！")
 
+
+
+
+class PaymentForm(ModelForm):
+    def __new__(cls,*args,**kwargs):
+            for field_name,field_obj in  cls.base_fields.items():
+                field_obj.widget.attrs['class'] = 'form-control'
+                if  field_name in cls.Meta.readonly:
+                    field_obj.widget.attrs['disabled'] =  "disabled"
+            return ModelForm.__new__(cls)
+    class Meta:
+            model =  models.Payment
+            fields = "__all__"
+            readonly = []

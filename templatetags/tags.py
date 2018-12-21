@@ -7,7 +7,8 @@ from king_admin.utils import prn_obj
 from django.utils.timezone import datetime,timedelta
 register = template.Library()
 from django.core.exceptions import FieldDoesNotExist
-
+from  crm import models
+from django.db.models import Sum
 @register.simple_tag
 def render_app_name(admin_class):
     return admin_class.model._meta.verbose_name
@@ -403,3 +404,21 @@ def recursive_related_objs_lookup2(objs):
 def render_enroll_contract(enroll_obj):
     return enroll_obj.enrollment_class.contract.template.format(course=enroll_obj.enrollment_class.course,customer=enroll_obj.customer.name)
 
+
+
+@register.simple_tag
+def get_action_name(admin_class,action):
+    func = getattr(admin_class,action)
+    if  hasattr( func,"display_name"):
+        return func.display_name
+    else:
+        return action
+
+@register.simple_tag
+def get_score(request,enroll_obj):
+
+    study_records = models.StudyRecord.objects.filter(student=enroll_obj)
+
+    study_records2 = enroll_obj.studyrecord_set.filter(course_record__from_class_id = enroll_obj.enrollment_class.id)
+    # study_records = enroll_obj.enrollment_class.courserecord
+    return study_records.aggregate(Sum('score'))['score__sum']

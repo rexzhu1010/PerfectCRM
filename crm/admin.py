@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.shortcuts import render,redirect,HttpResponse
 
 
 from crm import models
@@ -91,7 +92,7 @@ class UserProfileAdmin(BaseUserAdmin):
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal', {'fields': ('name',)}),
+        ('Personal', {'fields': ('name','stu_account')}),
         ('Permissions', {'fields': ('is_admin','is_active',"groups","user_permissions","roles")}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
@@ -107,17 +108,61 @@ class UserProfileAdmin(BaseUserAdmin):
     filter_horizontal = ("groups","user_permissions")
 
 # Now register the new UserAdmin...
+
+class CourseRcordAdmin(admin.ModelAdmin):
+    list_display = ['id','from_class','day_num','teacher','has_homework','homework_title',]
+
+    def initialize_studyrecords(self,request,queryset):
+        print('-------------->initialize_studyrecords',self,request,queryset)
+        if len(queryset) >1 :
+            return HttpResponse('只能选择一个班级')
+
+        print(queryset[0].from_class.enrollment_set.all())
+        try:
+            for enroll_obj in queryset[0].from_class.enrollment_set.all():
+                # models.StudyRecord.objects.get_or_create(
+                #     student= enroll_obj,
+                #     course_record= queryset[0],
+                #     attendance= 0,
+                #     score= 0,
+                # )
+                new_obj_list = []
+                new_obj_list.append(models.StudyRecord(
+                        student= enroll_obj,
+                        course_record= queryset[0],
+                        attendance= 0,
+                        score= 0,
+                ))
+            models.StudyRecord.objects.bulk_create(new_obj_list)  #批量创建
+        except Exception as e:
+            return HttpResponse("已有本节课记录，不能再创建，请检查学习记录表！！")
+
+        return  redirect("/admin/crm/studyrecord/?course_record__id__exact=%s"%queryset[0].id)
+    initialize_studyrecords.short_description = "初始化本节所有员的上课记录"
+
+    actions = [initialize_studyrecords,]
+
+
+class StudyRecordAdmin(admin.ModelAdmin):
+    list_display = ['id','student','course_record','attendance','score','date',]
+    list_filter = ['course_record','score','attendance','course_record__from_class','student']
+    list_editable = ['attendance',"score"]
+
+class EnollmentAdmin(admin.ModelAdmin):
+    list_display = ['id','customer',]
+
+
 admin.site.register(models.UserProfile, UserProfileAdmin)
 admin.site.register(models.Customer,CustomerAdmin)
 admin.site.register(models.CustomerFollowUp)
-admin.site.register(models.Enrollment)
+admin.site.register(models.Enrollment,EnollmentAdmin)
 admin.site.register(models.Course)
 admin.site.register(models.ClassList)
-admin.site.register(models.CourseRecord)
+admin.site.register(models.CourseRecord,CourseRcordAdmin)
 admin.site.register(models.Branch)
 admin.site.register(models.Role)
 admin.site.register(models.Payment)
-admin.site.register(models.StudyRecord)
+admin.site.register(models.StudyRecord,StudyRecordAdmin)
 admin.site.register(models.Tag)
 admin.site.register(models.Menu)
 admin.site.register(models.ContractTemplate,ContractTemplateAdmin)

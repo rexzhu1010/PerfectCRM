@@ -7,6 +7,7 @@ from django.shortcuts import redirect,render
 
 from django.forms import  ValidationError
 from  django.utils.translation import  ugettext as _
+from django.shortcuts import render,redirect,HttpResponse
 
 enable_admins = {}
 class BaseAdmin(object):
@@ -108,6 +109,53 @@ class UserProfileAdmin(BaseAdmin):
     filter_horizontal = ("user_permissions","groups")
     form_exclude_field = ("last_login",)
 
+
+class EnrollmentAdmin(BaseAdmin):
+    list_display = ("customer","enrollment_class",)
+
+
+class CourseRcordAdmin(BaseAdmin):
+    list_display = ['id','from_class','day_num','teacher','has_homework','homework_title',]
+
+    def initialize_studyrecords(self,request,queryset):
+        print('-------------->initialize_studyrecords',self,request,queryset)
+        if len(queryset) >1 :
+            return HttpResponse('只能选择一个班级')
+
+        print(queryset[0].from_class.enrollment_set.all())
+        try:
+            for enroll_obj in queryset[0].from_class.enrollment_set.all():
+                # models.StudyRecord.objects.get_or_create(
+                #     student= enroll_obj,
+                #     course_record= queryset[0],
+                #     attendance= 0,
+                #     score= 0,
+                # )
+                new_obj_list = []
+                new_obj_list.append(models.StudyRecord(
+                        student= enroll_obj,
+                        course_record= queryset[0],
+                        attendance= 0,
+                        score= 0,
+                ))
+            models.StudyRecord.objects.bulk_create(new_obj_list)  #批量创建
+        except Exception as e:
+            return HttpResponse("已有本节课记录，不能再创建，请检查学习记录表！！")
+
+        return  redirect("/king_admin/crm/studyrecord/?course_record=%s"%queryset[0].id)
+    initialize_studyrecords.display_name = "初始化本节所有员的上课记录"
+
+    actions = ["initialize_studyrecords",]
+
+
+class StudyRecordAdmin(BaseAdmin):
+    list_display = ['student','course_record','attendance','score','date',]
+    list_filters = ['course_record','score']
+    list_editable = ['attendance',"score"]
+
 register(models.Customer,CustomerAdmin)
 register(models.CustomerFollowUp,CustomerFollowUpAdmin)
 register(models.UserProfile,UserProfileAdmin)
+register(models.Enrollment,EnrollmentAdmin)
+register(models.StudyRecord,StudyRecordAdmin)
+register(models.CourseRecord,CourseRcordAdmin)

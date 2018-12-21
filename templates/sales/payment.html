@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+{% load tags %}
+
+{% block page-content %}
+
+
+        <form  class="form-horizontal col-lg-7" role="form" method="post">
+         {%  if errors %}
+            {% for v in errors %}
+                <span style="color: red">  {{ v }} </span>
+            {% endfor %}
+        {% endif %}
+                <div class="form-group">
+                    <lable class="col-sm-2 control-label" style="font-weight: bold">客户</lable>
+                    <div class="col-sm-10">{{ enroll_obj.customer }}</div>
+                </div>
+                 <div class="form-group">
+                    <lable class="col-sm-2 control-label "  style="font-weight: bold">所报课程</lable>
+                    <div class="col-sm-10">{{ enroll_obj.enrollment_class }}</div>
+                </div>
+                 <div class="form-group">
+                    <lable class="col-sm-2 control-label"  style="font-weight: bold">缴费金额</lable>
+                    <input type="text" name="amount"  placeholder="至少500">
+                </div>
+                 <div class="form-group">
+                    <lable class="col-sm-2 control-label"  style="font-weight: bold">课程顾问</lable>
+                    <div class="col-sm-10">{{ enroll_obj.consultant }}</div>
+                </div>
+
+                <input type="submit" class="btn btn-info col-lg-offset-2 " value="提交">
+        </form>
+
+
+{% endblock %}
+
+
+

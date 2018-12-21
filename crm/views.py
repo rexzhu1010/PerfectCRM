@@ -7,6 +7,8 @@ from django.db import IntegrityError
 import random,string
 from crm import forms
 from django.core.cache import cache
+import os
+from PerfectCRM import settings
 
 @login_required
 def index(request):
@@ -38,6 +40,8 @@ def enrollment(request,obj_id):
                 enroll_obj = models.Enrollment.objects.get(customer_id=customer_obj.id,
                                                            enrollment_class_id=enroll_form.cleaned_data[
                                                                "enrollment_class"].id)
+                if enroll_obj.contract_agreed:  #判断学生是否已同意
+                   return  redirect("/crm/contract_review/%s/"%enroll_obj.id)
 
             # msgs["register_link"].fomat(enroll_obj_id=enroll_obj.id,random_str=random_str)
             random_str =  "".join(random.sample(string.ascii_lowercase+string.digits,8))
@@ -59,6 +63,16 @@ def  student_registration(request,obj_id,random_str):
     if enroll_obj.contract_agreed :
         return render(request, "sales/stu_registration.html", {"status": 1})
     if request.method=="POST":
+        if request.is_ajax():   #保存上传文件
+            print("ajax post : ", request.FILES)
+            enroll_data_dir = "%s/%s"%(settings.ENROLLED_DATA,obj_id)
+            if not os.path.exists(enroll_data_dir):  #判断目录是否存在
+                os.makedirs(enroll_data_dir,exist_ok=True)
+            for k,file_obj in request.FILES.items():  #保存文件
+                with open("%s/%s"%(enroll_data_dir,file_obj.name),"wb") as f:
+                    for chuck in file_obj.chunks():
+                        f.write(chuck)
+
         customer_form = forms.CustomerForm(request.POST,instance=enroll_obj.customer)
         if customer_form.is_valid():
             customer_form.save()
@@ -69,3 +83,50 @@ def  student_registration(request,obj_id,random_str):
         customer_form = forms.CustomerForm(instance=enroll_obj.customer)
 
     return render(request,"sales/stu_registration.html",{"customer_form":customer_form,"enroll_obj":enroll_obj})
+
+
+
+def contract_review(request,enroll_id):
+    enroll_obj = models.Enrollment.objects.get(id=enroll_id)
+    customer_form =  forms.CustomerForm(instance=enroll_obj.customer)
+    enroll_form = forms.EnrollmentForm(instance=enroll_obj)
+
+    return  render(request,"sales/contract_review.html",{"enroll_obj":enroll_obj,"customer_form":customer_form,"enroll_form":enroll_form})
+
+
+
+def enrollment_rejection(request,enroll_id):
+    enroll_obj =  models.Enrollment.objects.get(id=enroll_id)
+    enroll_obj.contract_agreed=False
+    enroll_obj.save()
+    return redirect("/crm/customers/%s/enrollment/"%enroll_obj.customer.id)
+
+
+
+def payment(request,enroll_id):
+    enroll_obj = models.Enrollment.objects.get(id=enroll_id)
+    errors=[]
+    print(enroll_obj)
+    if request.method == "POST":
+        payment_amount =  request.POST.get("amount")
+        if payment_amount:
+            payment_amount = int(payment_amount)
+            if payment_amount < 500 :
+                errors.append("缴费金额不能低于500")
+            else:
+                payment_obj = models.Payment.objects.create(
+                    customer= enroll_obj,
+                    course =  enroll_obj.enrollment_class.course,
+                    amount= payment_amount,
+                    consultant= enroll_obj.consultant
+                )
+                enroll_obj.customer.status = 0
+                enroll_obj.customer.save()
+                return  redirect("/king_admin/crm/customer/")
+
+    if  not enroll_obj.contract_approved:
+        enroll_obj.contract_approved =True
+        enroll_obj.save()
+
+
+    return render(request,"sales/payment.html",{"enroll_obj":enroll_obj,"errors":errors})

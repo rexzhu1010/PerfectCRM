@@ -20,7 +20,7 @@ from PerfectCRM import views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    url(r"^$",include("crm.urls") ),
+    url(r"^$",views.index ),
     url(r'^admin/', admin.site.urls),
     url(r'^crm/',include("crm.urls")),
     url(r'^accounts/login/$',views.acc_login),

@@ -3,13 +3,6 @@
 {% load tags %}
 
 
-
-
-
-
-
-
-
     {%  block extra-css-resources %}
         <link href="/static/plugins/dropzone/dropzone.css" rel="stylesheet">
     {% endblock %}
@@ -81,13 +74,18 @@
                     <hr>
 
                     <p>请上传你的身份证图片</p>
-                    <form action="/file-upload" style="border:1px dashed lightblue;height: 250px" class="dropzone form-horizontal"  role="form" id="my-awesome-dropzone">
+{#                        action="/file-upload"#}
+                    <form  method="post" action="{{ request.path }}" style="border:1px dashed lightblue;height: 250px" class="dropzone form-horizontal"  role="form" id="my-awesome-dropzone">
                       <div class="fallback form-group">
                           <div class="col-sm-9  col-md-offset-2">
                         <input name="file" type="file" multiple />
                           </div>
                       </div>
+
+
                     </form>
+
+
 
                     {% else %}
                         <h2> 感谢，报名表已提交，你的合同很快被审核。</h2>
@@ -96,8 +94,35 @@
             </div>
     </div>
 
+
+{% endblock %}
+
+{% block extra-js %}
     <script>
+
+            $(document).ready(function () {
+                Dropzone.options.myAwesomeDropzone = {
+                  paramName: "file", // The name that will be used to transfer the file
+                  maxFilesize: 2, // MB
+                  accept: function(file, done) {
+                    if (file.name == "justinbieber.jpg") {
+                      done("Naha, you don't.");
+                    }
+                    else { done(); }
+                  }
+                };
+
+
+            })
+
+
             function RegisterFormCheck() {
+                   if ($(".dz-complete").length < 2) {
+                            alert("必须至少上传2张图片!")
+                            return false;
+                        }
+
+
                    if ( $("form :checkbox").prop("checked")){
                        $('form[id=reg] :input[disabled]').removeAttr('disabled')
                        return True;
@@ -106,5 +131,10 @@
                        return false
                    }
             }
+
+
+
+
     </script>
 {% endblock %}
+

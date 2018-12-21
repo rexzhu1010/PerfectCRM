@@ -293,6 +293,7 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     roles  =  models.ManyToManyField("Role",blank=True)
     objects = UserProfileManager()
 
+    stu_account = models.ForeignKey("Customer",verbose_name="关联学员帐号",blank=True,null=True,help_text="只有学员报名后方可为其创建帐号",on_delete=models.CASCADE)
     USERNAME_FIELD = 'email'   #让哪个字段做用户名
     REQUIRED_FIELDS = ['name']  #必须填字段
 

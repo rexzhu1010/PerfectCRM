@@ -141,3 +141,5 @@ STATICFILES_DIRS = (
 		)
 
 AUTH_USER_MODEL =  'crm.UserProfile'
+
+ENROLLED_DATA = "%s/enrolled_data/"%BASE_DIR

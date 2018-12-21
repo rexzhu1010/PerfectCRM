@@ -1,0 +1,49 @@
+{% extends "index.html" %}
+{% load tags %}
+
+
+{%  block page-content %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">我的课程</h3>
+  </div>
+  <div class="panel-body">
+
+      {{ request.user.stu_account }}
+
+              <table class="table table-hover">
+                  <thead>
+                    <tr>
+                        <th>课程名称</th>
+                        <th>班级</th>
+                        <th>开课日期</th>
+                        <th>结业日期</th>
+                        <th>课程进度</th>
+                        <th>我的成绩</th>
+                        <th>作业管理</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {%  for enroll_obj in request.user.stu_account.enrollment_set.all %}
+                    <tr>
+                        <td>{{ enroll_obj.enrollment_class.course }}</td>
+                        <td>{{ enroll_obj.enrollment_class }}</td>
+                        <td>{{ enroll_obj.enrollment_class.start_date }}</td>
+                        <td>{{ enroll_obj.enrollment_class.end_date }}</td>
+                        <td>{{ enroll_obj.enrollment_class.courserecord_set.all.count }}</td>
+                        <td>{% get_score  request enroll_obj %}</td>
+                        <td><a href="{% url 'studyrecords' enroll_obj.id %}">作业管理</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                  <tr><td></td><td><p> total :  条记录</p></td></tr>
+                  </tfoot>
+              </table>
+
+
+  </div>
+</div>
+
+{% endblock %}
