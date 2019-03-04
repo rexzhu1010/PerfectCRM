@@ -23,15 +23,14 @@ class CustomerAdmin(admin.ModelAdmin):
     #ordering =
 
 
-    # actions = ["test_action", ]
+    actions = ["test_action", ]
     #
     #
-    # def test_action(self,request,arg2):
-    #     print('test action:',self,request,arg2)
-    #     return render(request,"king_admin/table_index.html")
+    def test_action(self,request,arg2):
+        print(request.user.has_perm)
 
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user','name')
+# class UserProfileAdmin(admin.ModelAdmin):
+#     list_display = ('id','user','name')
 
 
 class ContractTemplateAdmin(admin.ModelAdmin):
@@ -88,12 +87,12 @@ class UserProfileAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    list_display = ('email', 'name', 'is_admin','is_active','is_staff')
+    list_display = ('email', 'is_admin','name','is_active','is_staff',"is_superuser")
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal', {'fields': ('name','stu_account')}),
-        ('Permissions', {'fields': ('is_admin','is_active',"groups","user_permissions","roles")}),
+        ('Permissions', {'fields': ('is_admin','is_active',"is_superuser","groups","user_permissions","roles")}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
@@ -150,6 +149,8 @@ class StudyRecordAdmin(admin.ModelAdmin):
 
 class EnollmentAdmin(admin.ModelAdmin):
     list_display = ['id','customer',]
+
+
 
 
 admin.site.register(models.UserProfile, UserProfileAdmin)

@@ -1,0 +1,35 @@
+{%  extends 'index.html' %}
+{% load tags %}
+{% block page-content %}
+
+  <!-- Default panel contents -->
+  <div class="panel-heading">班级:{{ studyrecord_obj.student.enrolled_class }}  | 节次{{ studyrecord_obj.course_record.day_num }}</div>
+  <div class="panel-body">
+        <h4>作业标题:{{ studyrecord_obj.course_record.homework_title }}</h4>
+        <h4>作业详情：<pre>{{ studyrecord_obj.course_record.homework_content }}</pre></h4>
+        <h4>老师评语:{{ studyrecord_obj.memo }}</h4>
+        <h4>本节成绩:{{ studyrecord_obj.score }}</h4>
+
+
+        <div class="row">
+            <p>已上传作业</p>
+            <ul>
+                {% for file in file_lists %}
+                    <li>{{ file.0 }} | {{ file.1 }} | {{ file.2 }} <a href="?delete={{ file.0 }}">删除</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <p>请上传你的作业</p>
+        <form  method="post" action="{{ request.path }}" style="border:1px dashed lightblue;height: 250px" class="dropzone form-horizontal"  role="form" id="my-awesome-dropzone">
+                      <div class="fallback form-group">
+                          <div class="col-sm-9  col-md-offset-2">
+                                <input name="file" type="file"   multiple />
+                          </div>
+                      </div>
+        </form>
+
+  <!-- Table -->
+</div>
+{% endblock %}
+

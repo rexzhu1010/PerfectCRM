@@ -290,7 +290,9 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     name = models.CharField(max_length=32)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     roles  =  models.ManyToManyField("Role",blank=True)
+
     objects = UserProfileManager()
 
     stu_account = models.ForeignKey("Customer",verbose_name="关联学员帐号",blank=True,null=True,help_text="只有学员报名后方可为其创建帐号",on_delete=models.CASCADE)
@@ -308,6 +310,7 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     def __str__(self):              # __unicode__ on Python 2
         return self.email
 
+    #是否有什么权限
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
         # Simplest possible answer: Yes, always
@@ -322,8 +325,23 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
-        return self.is_admin
+        return self.is_active
 
+    class Meta:
+        permissions = (('crm_table_index','可以查看kingadmin里多少每张表'),
+                       ('crm_table_list', '可以查看kingadmin里每张表里的数据'),
+                       ('crm_table_objs_change', '可以修改 kingadmin里每张表的数据'),
+                       ('crm_table_obj_add', '可以在 kingadmin 里的表增加数据'),
+                       ('crm_table_delete', '可以删除kingadmin中表的数据'),
+                       ('crm_table_objs_change_view', '可以修改 kingadmin里每张表的数据'),
+                       ('crm_table_obj_add_view', '可以在 kingadmin 里的表增加数据'),
+                       ('crm_table_delete_view', '可以删除kingadmin中表的数据'),
+                       )
+    # 'crm_table_index':['table_index','GET',[],{},],
+    # 'crm_table_list':['table_objs','GET',[],{}],
+    # 'crm_table_objs_change':['table_objs_change','GET',[],{}],
+    # 'crm_table_obj_add':['table_objs_add','GET',[],{}],
+    # 'crm_table_obj_delete':['obj_delete','GET',[],{}],
 
 
 
