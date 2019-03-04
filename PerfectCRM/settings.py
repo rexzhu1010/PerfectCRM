@@ -140,6 +140,8 @@ STATICFILES_DIRS = (
 			os.path.join(BASE_DIR, "statics"),
 		)
 
-AUTH_USER_MODEL =  'crm.UserProfile'
+AUTH_USER_MODEL =  'crm.UserProfile' #自定义用哪张表做用户认证
 
 ENROLLED_DATA = "%s/enrolled_data/"%BASE_DIR
+
+HOMEWORK_DATA = "%s/homeworks/" % BASE_DIR

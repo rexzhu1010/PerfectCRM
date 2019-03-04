@@ -21,7 +21,7 @@
                         <th>结业日期</th>
                         <th>课程进度</th>
                         <th>我的成绩</th>
-                        <th>作业管理</th>
+                        <th>学习记录</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -33,7 +33,7 @@
                         <td>{{ enroll_obj.enrollment_class.end_date }}</td>
                         <td>{{ enroll_obj.enrollment_class.courserecord_set.all.count }}</td>
                         <td>{% get_score  request enroll_obj %}</td>
-                        <td><a href="{% url 'studyrecords' enroll_obj.id %}">作业管理</a></td>
+                        <td><a href="{% url 'studyrecords' enroll_obj.id %}">学习记录</a></td>
                     </tr>
                     {% endfor %}
                   </tbody>

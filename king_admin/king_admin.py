@@ -49,7 +49,6 @@ class BaseAdmin(object):
         '''用户可以在此自义当前表的表单验证，相当于 djano form 的clean 方法'''
         pass
 
-
 class CustomerAdmin(BaseAdmin):
     list_display = ['id','name','qq','source','consultant','consult_course','date','status',"enroll"]
     list_filters = ['source','consultant','consult_course','status',"qq","date"]
@@ -87,11 +86,6 @@ class CustomerAdmin(BaseAdmin):
         else:
             return self.cleaned_data["referral_from"]   #检查完一下要 return 该字段,不然 这字段就会是空的
 
-
-
-
-
-
 class CustomerFollowUpAdmin(BaseAdmin):
     list_display = ("id",'customer','consultant','date')
 
@@ -102,17 +96,14 @@ def register(model_class,admin_class=None):
     admin_class.model = model_class
     enable_admins[model_class._meta.app_label][model_class._meta.model_name] =  admin_class
 
-
 class UserProfileAdmin(BaseAdmin):
     list_display = ("email","name")
     readonly_fields = ("password",)
     filter_horizontal = ("user_permissions","groups")
     form_exclude_field = ("last_login",)
 
-
 class EnrollmentAdmin(BaseAdmin):
     list_display = ("customer","enrollment_class",)
-
 
 class CourseRcordAdmin(BaseAdmin):
     list_display = ['id','from_class','day_num','teacher','has_homework','homework_title',]
@@ -146,7 +137,6 @@ class CourseRcordAdmin(BaseAdmin):
     initialize_studyrecords.display_name = "初始化本节所有员的上课记录"
 
     actions = ["initialize_studyrecords",]
-
 
 class StudyRecordAdmin(BaseAdmin):
     list_display = ['student','course_record','attendance','score','date',]

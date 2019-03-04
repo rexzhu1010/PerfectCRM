@@ -285,18 +285,14 @@ def display_obj_related(objs):
         html_ele +="</ul>"
 
 
-
-
-
     return mark_safe(html_ele)
-
-
 
 
 def recursive_related_objs_lookup(obj):
 
     html_ele=""
     temp_ele=""
+    #查找一对多，本对象所有 一对多的表
     for otm_obj in obj._meta.related_objects:   #循环对像中 有关联的表
         # if "ManyToOneRel" not in otm_obj.__repr__():
         #     continue
@@ -321,6 +317,7 @@ def recursive_related_objs_lookup(obj):
 
         # break
 
+    #判断 obj 多对多
     if (len(obj._meta.local_many_to_many) > 0):
         temp_ele += "<ul>"
         for mtm_obj in obj._meta.local_many_to_many:

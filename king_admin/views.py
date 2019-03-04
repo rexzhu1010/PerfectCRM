@@ -7,7 +7,10 @@ from king_admin import king_admin,forms
 from crm import models
 from django.contrib.auth.decorators import login_required
 
+from king_admin import permission,permission_list
 
+
+@permission.check_permission
 @login_required
 def index(request):
     #print(king_admin.enabled_admins['crm']['customerfollowup'].model )
@@ -18,6 +21,8 @@ def index(request):
     # print("11111111111")
     return render(request, "king_admin/table_index.html",{'table_list':king_admin.enable_admins})
 
+
+@permission.check_permission
 @login_required
 def display_table_objs(request,app_name,table_name):
 
@@ -81,7 +86,7 @@ def display_table_objs(request,app_name,table_name):
                                                          "selectdate":request.GET.get("date") or ""},
                                                         )
 
-
+@permission.check_permission
 @login_required
 def table_objs_change(request,app_name,table_name,obj_id):
     admin_class = king_admin.enable_admins[app_name][table_name]
@@ -101,6 +106,9 @@ def table_objs_change(request,app_name,table_name,obj_id):
         form_obj= model_form_class(instance=obj)
     return  render(request,"king_admin/table_obj_change.html",{"form_obj":form_obj,"admin_class":admin_class,"app_name":app_name,"table_name":table_name})
 
+
+
+@permission.check_permission
 @login_required
 def table_objs_add(request,app_name,table_name):
     print("add")
@@ -124,6 +132,8 @@ def table_objs_add(request,app_name,table_name):
 
     return  render(request,"king_admin/table_obj_add.html",{"form_obj":model_form_class,"admin_class":admin_class,})
 
+
+@permission.check_permission
 @login_required
 def table_obj_delete(request,app_name,table_name,obj_id):
     admin_class =  king_admin.enable_admins[app_name][table_name]
@@ -146,6 +156,7 @@ def table_obj_delete(request,app_name,table_name,obj_id):
     return  render(request,"king_admin/table_obj_delete.html",{"objs":objs,"app_name":app_name,"table_name":table_name,"errors":errors})
 
 
+@permission.check_permission
 @login_required
 def password_reset(request,app_name,table_name,obj_id):
     admin_class =  king_admin.enable_admins[app_name][table_name]
