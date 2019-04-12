@@ -2,6 +2,8 @@
 
 from django.shortcuts import redirect
 
+
+#这个是息定义钩子权限 ，可动态判断url的get或post传参， 比如限制 consultant 必须等于 登入的ID 号
 def  view_my_own_coustomer(request,permission_val):
     print("running the permission_hook !!!!!!!!!!!!!!!!!!")
     my_url=""

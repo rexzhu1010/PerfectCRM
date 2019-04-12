@@ -328,15 +328,19 @@ class UserProfile(AbstractBaseUser,PermissionsMixin):
         return self.is_active
 
     class Meta:
-        permissions = (('crm_table_index','可以查看kingadmin里多少每张表'),
-                       ('crm_table_list', '可以查看kingadmin里每张表里的数据'),
-                       ('crm_table_objs_change', '可以修改 kingadmin里每张表的数据'),
-                       ('crm_table_obj_add', '可以在 kingadmin 里的表增加数据'),
-                       ('crm_table_delete', '可以删除kingadmin中表的数据'),
-                       ('crm_table_objs_change_view', '可以修改 kingadmin里每张表的数据'),
-                       ('crm_table_obj_add_view', '可以在 kingadmin 里的表增加数据'),
-                       ('crm_table_delete_view', '可以删除kingadmin中表的数据'),
+        permissions = (
+        ("crm_table_index","可以查看kingadmin里多少每张表"),
+        ("crm_table_list","可以查看kingadmin里每张表里的数据"),
+        ("crm_table_objs_change", "可以修改kingadmin里每张表的数据"),
+        ("crm_table_obj_add","可以在kingadmin里的表增加数据"),
+        ("crm_table_delete","可以删除kingadmin中表的数据"),
+        ("crm_table_objs_change_view","可以查看kingadmin的修改"),
+        ("crm_table_obj_add_view","可以查看在kingadmin里的表增加页面"),
+        ("crm_table_delete_view","可以查看删除页面kingadmin"),
                        )
+
+
+
     # 'crm_table_index':['table_index','GET',[],{},],
     # 'crm_table_list':['table_objs','GET',[],{}],
     # 'crm_table_objs_change':['table_objs_change','GET',[],{}],

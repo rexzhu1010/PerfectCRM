@@ -419,3 +419,42 @@ def get_score(request,enroll_obj):
     study_records2 = enroll_obj.studyrecord_set.filter(course_record__from_class_id = enroll_obj.enrollment_class.id)
     # study_records = enroll_obj.enrollment_class.courserecord
     return study_records.aggregate(Sum('score'))['score__sum']
+
+
+
+@register.simple_tag
+def get_model_name(admin_class):
+    return admin_class.model._meta.model_name
+
+@register.simple_tag
+def build_pages(querysets,request):
+    pages = ""
+    args = render_url_args(request,"page")
+    if querysets.has_previous:
+        pages += '''<a href="?%spage=%s" class="btn-info btn">上一页</a>...'''%(args,querysets.previous_page_number)
+
+    for i in querysets.paginator.page_range:
+        if querysets.number == i :
+            pages += "<span class ='btn-default btn' > %s </span>." % (i)
+            continue
+        if abs(querysets.number - i ) < 3:
+            pages +="<a href='?%spage=%s'><span class ='btn-info btn' > %s </span></a>."%(args,i,i)
+
+    if querysets.has_next:
+            pages +='''...<a href="?%spage=%s" class="btn-info btn">下一页</a>'''%(args,querysets.next_page_number)
+
+    return mark_safe(pages)
+
+
+
+@register.simple_tag
+def render_url_args(request,contdition):
+    # print("我是处理url get参数的")
+    args = ""
+    for k,v in request.GET.items():
+        print("对比",k,contdition)
+        if k == contdition :
+            continue
+        args += "%s=%s&"%(k,v)
+    print(args)
+    return args
